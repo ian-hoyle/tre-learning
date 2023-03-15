@@ -12,61 +12,90 @@ provider "aws" {
   region  = "eu-west-2"
   profile = "terraform"
 }
-/*
-resource "aws_instance" "app_server" {
-  ami           = "ami-0a1d67b314dac43af"
-  instance_type = "t2.micro"
-
-  tags = {
-    Name = "ExampleAppServerInstance"
-  }
-}
-*/
-resource "aws_sns_topic" "my_first_sns_topic" {
-  name = var.sns_name
+resource "aws_sns_topic" "orders" {
+  name = "orders-topic"
 }
 
-resource "aws_sns_topic_policy" "my_sns_topic_policy" {
-  arn = aws_sns_topic.my_first_sns_topic.arn
-  policy = data.aws_iam_policy_document.my_custom_sns_policy_document.json
+resource "aws_sqs_queue" "orders_to_process" {
+  name                       = "orders-to-process-queue"
+  receive_wait_time_seconds  = 20
+  message_retention_seconds  = 18400
 }
 
-data "aws_iam_policy_document" "my_custom_sns_policy_document" {
-  policy_id = "__default_policy_ID"
+resource "aws_sqs_queue" "orders_to_notify" {
+  name                       = "orders-to-notify-queue"
+  receive_wait_time_seconds  = 20
+  message_retention_seconds  = 18400
+}
 
-  statement {
-    actions = [
-      "SNS:Subscribe",
-      "SNS:SetTopicAttributes",
-      "SNS:RemovePermission",
-      "SNS:Receive",
-      "SNS:Publish",
-      "SNS:ListSubscriptionsByTopic",
-      "SNS:GetTopicAttributes",
-      "SNS:DeleteTopic",
-      "SNS:AddPermission",
-    ]
+resource "aws_sns_topic_subscription" "orders_to_process_subscription" {
+  protocol             = "sqs"
+  raw_message_delivery = true
+  topic_arn            = aws_sns_topic.orders.arn
+  endpoint             = aws_sqs_queue.orders_to_process.arn
+  filter_policy         = "{\"hello\": [\"ian\"]}"
+  filter_policy_scope  = "MessageBody"
+}
 
-    condition {
-      test     = "StringEquals"
-      variable = "AWS:SourceOwner"
+resource "aws_sns_topic_subscription" "orders_to_notify_subscription" {
+  protocol             = "sqs"
+  raw_message_delivery = true
+  topic_arn            = aws_sns_topic.orders.arn
+  endpoint             = aws_sqs_queue.orders_to_notify.arn
+}
 
-      values = [
-        var.account_id,
-      ]
+resource "aws_sqs_queue_policy" "orders_to_process_subscription" {
+  queue_url = aws_sqs_queue.orders_to_process.id
+  policy    = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "sns.amazonaws.com"
+      },
+      "Action": [
+        "sqs:SendMessage"
+      ],
+      "Resource": [
+        "${aws_sqs_queue.orders_to_process.arn}"
+      ],
+      "Condition": {
+        "ArnEquals": {
+          "aws:SourceArn": "${aws_sns_topic.orders.arn}"
+        }
+      }
     }
+  ]
+}
+EOF
+}
 
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
+resource "aws_sqs_queue_policy" "orders_to_notify_subscription" {
+  queue_url = aws_sqs_queue.orders_to_notify.id
+  policy    = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "sns.amazonaws.com"
+      },
+      "Action": [
+        "sqs:SendMessage"
+      ],
+      "Resource": [
+        "${aws_sqs_queue.orders_to_notify.arn}"
+      ],
+      "Condition": {
+        "ArnEquals": {
+          "aws:SourceArn": "${aws_sns_topic.orders.arn}"
+        }
+      }
     }
-
-    resources = [
-      aws_sns_topic.my_first_sns_topic.arn,
-    ]
-
-    sid = "__default_statement_ID"
-  }
+  ]
+}
+EOF
 }
