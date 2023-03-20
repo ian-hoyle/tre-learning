@@ -2,7 +2,7 @@
 #COPY . /lambda/src/
 #WORKDIR /lambda/src/
 #RUN sbt assembly
-
+#
 #FROM public.ecr.aws/lambda/java:11
 #COPY --from=builder /lambda/src/target/function.jar ${LAMBDA_TASK_ROOT}/lib/
 #CMD ["com.example.LambdaHandler::handleRequest"]
@@ -11,7 +11,7 @@
 # to use for the JDK and which sbt version to install.
 
 ARG OPENJDK_TAG=11.0.13
-FROM openjdk:${OPENJDK_TAG}
+FROM openjdk:${OPENJDK_TAG} as builder
 COPY . /lambda/src/
 WORKDIR /lambda/src/
 
@@ -35,3 +35,6 @@ RUN \
   sbt sbtVersion
 
 RUN sbt assembly
+
+COPY --from=builder /lambda/src/target/function.jar ${LAMBDA_TASK_ROOT}/lib/
+CMD ["com.example.LambdaHandler::handleRequest"]
