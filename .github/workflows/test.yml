@@ -19,6 +19,8 @@ jobs:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
       - run: |
+          git config --global user.email ${{ secrets.GIT_EMAIL }}
+          git config --global user.name ${{ secrets.GIT_NAME }}
           git checkout -b $BRANCH_NAME
           git push -u origin $BRANCH_NAME
           touch hello.txt
