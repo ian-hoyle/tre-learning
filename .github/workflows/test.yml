@@ -20,7 +20,6 @@ jobs:
       - run: |
           git checkout -b $BRANCH_NAME
           git push -u origin $BRANCH_NAME
-      - run: |
           touch hello.txt
       - name: Create Pull Request
         run: |
