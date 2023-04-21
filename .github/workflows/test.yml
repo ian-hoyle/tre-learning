@@ -25,6 +25,7 @@ jobs:
           git checkout -b $BRANCH_NAME
           git push -u origin $BRANCH_NAME
           touch hello.txt
+          git commit -m -S "hello"
       - name: Create Pull Request
         run: gh pr create --fill --label 'Version bump'
         env:
