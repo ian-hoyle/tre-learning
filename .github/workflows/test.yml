@@ -20,7 +20,7 @@ jobs:
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
       - run: |
           ./.github/scripts/setup.sh
-           git config --global user.email ian.hoyle.tna@gmail.com
+           git config --global user.email ian.hoyle@nationalarchives.gov.uk
            git config --global user.name 'Ian Hoyle'
           git checkout -b $BRANCH_NAME
           git push -u origin $BRANCH_NAME
