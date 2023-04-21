@@ -26,10 +26,6 @@ jobs:
           touch hello.txt
       - name: Create Pull Request
         run: |
-          # GitHub CLI api
-# https://cli.github.com/manual/gh_api
-      - name: create pull request
-      - run: |
           gh api \
           --method POST \
            -H "Accept: application/vnd.github+json" \
