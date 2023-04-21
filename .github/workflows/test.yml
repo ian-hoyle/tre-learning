@@ -21,7 +21,7 @@ jobs:
       - run: |
           ./.github/scripts/setup.sh
           git checkout -b $BRANCH_NAME
-          git push -u origin $BRANCH_NAME
+          # git push -u origin $BRANCH_NAME
           touch hello.txt
       - name: Create Pull Request
         run: gh pr create --fill --label 'Version bump'
