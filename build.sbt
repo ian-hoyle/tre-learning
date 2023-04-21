@@ -15,3 +15,16 @@ lazy val root = (project in file("."))
   ).settings(
     assembly / assemblyOutputPath := file("target/function.jar")
   )
+//libraryDependencies += "com.beachape" %% "enumeratum" % "1.5.13"
+//libraryDependencies += "com.beachape" %% "enumeratum-circe" % "1.5.21"
+libraryDependencies += "io.github.ian-hoyle" % "da-transform-schemas" % "0.102"
+
+
+val circeVersion = "0.14.2"
+
+libraryDependencies ++= Seq(
+  "io.circe" %% "circe-core",
+  "io.circe" %% "circe-generic",
+  "io.circe" %% "circe-parser",
+  "io.circe" %% "circe-generic-extras"
+).map(_ % circeVersion)

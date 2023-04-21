@@ -4,7 +4,7 @@ import java.util.{ Map => JavaMap }
 import com.amazonaws.lambda.thirdparty.com.google.gson.GsonBuilder
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 
-class     LambdaHandler() extends RequestHandler[JavaMap[String, String], String] {
+class  LambdaHandler() extends RequestHandler[JavaMap[String, String], String] {
   val gson = new GsonBuilder().setPrettyPrinting.create
 
   override def handleRequest(event: JavaMap[String, String], context: Context): String = {
