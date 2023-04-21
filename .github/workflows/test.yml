@@ -20,8 +20,10 @@ jobs:
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
       - run: |
           ./.github/scripts/setup.sh
+           git config --global user.email ian.hoyle.tna@gmail.com
+           git config --global user.name 'Ian Hoyle'
           git checkout -b $BRANCH_NAME
-          # git push -u origin $BRANCH_NAME
+          git push -u origin $BRANCH_NAME
           touch hello.txt
       - name: Create Pull Request
         run: gh pr create --fill --label 'Version bump'
