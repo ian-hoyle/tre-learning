@@ -28,13 +28,14 @@ jobs:
         run: |
           # GitHub CLI api
 # https://cli.github.com/manual/gh_api
-
-gh api \
-  --method POST \
-  -H "Accept: application/vnd.github+json" \
-  -H "X-GitHub-Api-Version: 2022-11-28" \
-  /repos/ian-hoyle/tre-learning/pulls \
-  -f title='Amazing new feature' \
- -f body='Please pull these awesome changes in!' \
- -f head='$BRANCH_NAME' \
- -f base='main' 
+      - name: create pull request
+      - run: |
+          gh api \
+          --method POST \
+           -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          /repos/ian-hoyle/tre-learning/pulls \
+          -f title='Amazing new feature' \
+          -f body='Please pull these awesome changes in!' \
+          -f head='$BRANCH_NAME' \
+          -f base='main' 
