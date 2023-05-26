@@ -99,3 +99,10 @@ resource "aws_sqs_queue_policy" "orders_to_notify_subscription" {
 }
 EOF
 }
+
+resource "aws_sqs_queue" "success_queue" {
+  name                       = "success_queue"
+  receive_wait_time_seconds  = 20
+  message_retention_seconds  = 18400
+}
+
