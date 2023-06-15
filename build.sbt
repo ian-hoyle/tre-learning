@@ -23,11 +23,10 @@ lazy val root = (project in file("."))
 libraryDependencies += "io.github.ian-hoyle" % "da-transform-schemas" % "0.102"
 
 
-val circeVersion = "0.14.3"
-
+val circeVersion = "0.14.2"
 libraryDependencies ++= Seq(
-  "io.circe" % "circe-core",
-  "io.circe" % "circe-generic",
-  "io.circe" % "circe-parser",
-  "io.circe" % "circe-generic-extras"
+  "io.circe" %% "circe-core",
+  "io.circe" %% "circe-generic",
+  "io.circe" %% "circe-parser",
+  "io.circe" %% "circe-generic-extras"
 ).map(_ % circeVersion)
