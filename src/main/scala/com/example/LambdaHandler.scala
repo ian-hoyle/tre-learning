@@ -15,6 +15,8 @@ class  LambdaHandler() extends RequestHandler[JavaMap[String, String], String] {
 
     logger.log(s"EVENT: $event")
 
-    "Hello from Scala!"
+    "{\"statusCode\": 200,\"body\": \"hello great one\"}"
+    
+    throw new Exception("failed ok")
   }
 }
