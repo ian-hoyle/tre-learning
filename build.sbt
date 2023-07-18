@@ -22,6 +22,10 @@ lazy val root = (project in file("."))
 //libraryDependencies += "com.beachape" %% "enumeratum-circe" % "1.5.21"
 libraryDependencies += "io.github.ian-hoyle" % "da-transform-schemas" % "0.102"
 
+ThisBuild / assemblyMergeStrategy  := {
+  case PathList("META-INF", _*) => MergeStrategy.discard
+  case _                        => MergeStrategy.first
+}
 
 val circeVersion = "0.14.2"
 libraryDependencies ++= Seq(
