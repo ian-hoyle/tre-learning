@@ -32,7 +32,7 @@ jobs:
       - name: Dispatch to workflows
         run: |
             curl -H "Accept: application/vnd.github.everest-preview+json" \
-            -H "Authorization: token ${{ secrets.DISPATCH_TOKEN }}" \
+            -H "Authorization: token ${{ secrets.AUTH_TOKEN }}" \
             --request POST \
             --data '{"event_type": "some_event", "client_payload": { "foo": "bar" }}' https://api.github.com/repos/${{ matrix.repo }}/dispatches
     
