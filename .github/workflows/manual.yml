@@ -25,8 +25,9 @@ jobs:
     name: Dispatch  
     runs-on: ubuntu-latest
     steps:
-    - uses: oprypin/find-latest-tag@v1
     - uses: actions/checkout@v2
+    - uses: oprypin/find-latest-tag@v1
+    
       with:
         repository: nationalarchives/tna-judgments-parser  # The repository to scan.
         #releases-only: true  # We know that all relevant tags have a GitHub release for them.
