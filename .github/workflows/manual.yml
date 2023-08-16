@@ -37,7 +37,8 @@ jobs:
     - run: |
        ./.github/scripts/check_version.sh ${{ steps.octokit.outputs.tag }} v0.6.1
        JSON=$(cat ./terraform/staging.tfvars.json)
-       echo '${{ fromJson(${JSON}).court_document_parse_image_versions.tre_court_document_parse }}'
+       echo ${{JSON}}
+       #echo '${{ fromJson(${JSON}).court_document_parse_image_versions.tre_court_document_parse }}'
 
    
      
