@@ -34,10 +34,18 @@ jobs:
       id: octokit  # The step ID to refer to later.
 
     - run: echo "Octokit is at version ${{ steps.octokit.outputs.tag }}"
+    - name: Read JSON file # this puts the whole JSON file in the read-json step output
+      id: read-json
+      run: | # to read multi-line JSON file and not bother with escaping
+          echo "config<<EOF" >> $GITHUB_OUTPUT
+          cat ./terraform/staging.tfvars.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+    - name: End      
     - run: |
+       echo "platform=${{fromJson(steps.read-json.outputs.config).court_document_parse_image_versions.tre_court_document_parse}}" 
        ./.github/scripts/check_version.sh ${{ steps.octokit.outputs.tag }} v0.6.1
-       JSON=$(cat ./terraform/staging.tfvars.json)
-       echo "::set-output name=matrix::${JSON//'%'/'%25'}"
+       #JSON=$(cat ./terraform/staging.tfvars.json)
+       #echo "::set-output name=matrix::${JSON//'%'/'%25'}"
        #echo ${{JSON}}
        #echo '${{ fromJson(${JSON}).court_document_parse_image_versions.tre_court_document_parse }}'
 
