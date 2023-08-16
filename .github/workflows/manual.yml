@@ -28,7 +28,7 @@ jobs:
     - uses: oprypin/find-latest-tag@v1
       with:
         repository: nationalarchives/tna-judgments-parser  # The repository to scan.
-        releases-only: true  # We know that all relevant tags have a GitHub release for them.
+        #releases-only: true  # We know that all relevant tags have a GitHub release for them.
       id: octokit  # The step ID to refer to later.
 
     - run: echo "Octokit is at version ${{ steps.octokit.outputs.tag }}"
