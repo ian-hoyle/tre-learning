@@ -46,7 +46,7 @@ jobs:
        echo "platform=${{fromJson(steps.read-json.outputs.config).court_document_parse_image_versions.tre_court_document_parse}}" 
        ./.github/scripts/check_version.sh ${{ steps.octokit.outputs.tag }} v0.6.1
     - name: Update json-values description
-      uses: restack/update-json-values-action@v1.0.0
+      uses: restackio/update-json-values-action@v1.0.0
       with:
         file: ./terraform/staging.tfvars.json
         values: "{'court_document_parse_image_versions.tre_court_document_parse': 'vGOOD'}"
