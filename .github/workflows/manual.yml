@@ -48,7 +48,7 @@ jobs:
     - name: Update json-values description
       uses: jossef/action-set-json-field@v2.1
       with:
-        file: ./terraform/staging.tfvars.json
+        file: ./terraforms/staging.tfvars.json
         field: court_document_parse_image_versions.tre_court_document_parse
         value: vGOOD
       
