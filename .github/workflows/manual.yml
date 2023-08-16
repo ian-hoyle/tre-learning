@@ -32,7 +32,7 @@ jobs:
       id: octokit  # The step ID to refer to later.
 
     - run: echo "Octokit is at version ${{ steps.octokit.outputs.tag }}"
-    - run: bash scripts/check_version.sh ${{ steps.octokit.outputs.tag }} v0.6.1
+    - run: bash ./.github/scripts/check_version.sh ${{ steps.octokit.outputs.tag }} v0.6.1
 
    
      
