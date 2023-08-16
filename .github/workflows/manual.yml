@@ -36,6 +36,7 @@ jobs:
     - run: echo "Octokit is at version ${{ steps.octokit.outputs.tag }}"
     - run: |
        ./.github/scripts/check_version.sh ${{ steps.octokit.outputs.tag }} v0.6.1
+       echo '${{ fromJson(./terraform/staging.tfvars.json).court_document_parse_image_versions.tre_court_document_parse }}'
 
    
      
