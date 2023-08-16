@@ -24,16 +24,14 @@ jobs:
    dispatch:
     name: Dispatch  
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        repo: ['ian-hoyle/test']
-    timeout-minutes: 5
     steps:
-      - name: Dispatch to workflows
-        run: |
-            curl -H "Accept: application/vnd.github.everest-preview+json" \
-            -H "Authorization: token ${{ secrets.AUTH_TOKEN }}" \
-            --request POST \
-            --data '{"event_type": "some_event", "client_payload": { "foo": "bar" }}' https://api.github.com/repos/${{ matrix.repo }}/dispatches
-    
+     - uses: oprypin/find-latest-tag@v1
+       with:
+        repository: nationalarchives/tna-judgments-parser  # The repository to scan.
+        releases-only: true  # We know that all relevant tags have a GitHub release for them.
+        id: octokit  # The step ID to refer to later.
+
+     - run: echo "Octokit is at version ${{ steps.octokit.outputs.tag }}"
+
+     
   
