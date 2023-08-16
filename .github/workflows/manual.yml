@@ -40,8 +40,9 @@ jobs:
           echo "config<<EOF" >> $GITHUB_OUTPUT
           cat ./terraform/staging.tfvars.json >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-    - name: End      
-    - run: |
+    - name: End 
+      id: echo value
+      run: |
        echo "platform=${{fromJson(steps.read-json.outputs.config).court_document_parse_image_versions.tre_court_document_parse}}" 
        ./.github/scripts/check_version.sh ${{ steps.octokit.outputs.tag }} v0.6.1
        #JSON=$(cat ./terraform/staging.tfvars.json)
