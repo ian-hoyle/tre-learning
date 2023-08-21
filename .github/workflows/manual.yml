@@ -49,7 +49,7 @@ jobs:
        grep 'v' props.json |  sort -bt. -k1,1 -k2,2n -k3,3n -k4,4n -k5,5n | tail -1 )"
     - name: Output latest
       run: | 
-       echo "tna-judgments-parser is at version ${{step.echo-value.LATEST_VERSION}}"
+       echo "tna-judgments-parser is at version ${{steps.echo-value.LATEST_VERSION}}"
     
     
        
