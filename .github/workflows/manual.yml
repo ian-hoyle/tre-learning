@@ -43,7 +43,7 @@ jobs:
     - name: End 
       id: echo-value
       run: |
-       echo "${{toJson(fromJson(steps.read-json.outputs.config).imageIds.*.imageTag.*)}}" >> props.json
+       echo "${{toJson(fromJson(steps.read-json.outputs.config).imageIds.*.imageTag)}}" >> props.json
        cat props.json
        echo "::set-output name=LATEST_VERSION::$(
        grep 'v' props.json |  sort -bt. -k1,1 -k2,2n -k3,3n -k4,4n -k5,5n | tail -1 )"
