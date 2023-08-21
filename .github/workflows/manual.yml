@@ -43,7 +43,8 @@ jobs:
     - name: End 
       id: echo-value
       run: |
-       echo "platform=${{fromJson(steps.read-json.outputs.config).imageIds.*.imageTag.[2]}}" 
+       echo "${{fromJson(steps.read-json.outputs.config).imageIds.*.imageTag}}" >> props.json
+       cat props.json
 #       echo "platform=${{fromJson(steps.read-json.outputs.config).court_document_parse_image_versions.tre_court_document_parse}}" 
 #      ./.github/scripts/check_version.sh ${{ steps.octokit.outputs.tag }} v0.16.3
 #    - name: Update json-values description
