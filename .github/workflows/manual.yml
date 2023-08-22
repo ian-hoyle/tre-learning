@@ -50,9 +50,11 @@ jobs:
        grep v props.json |  sort -bt. -k1,1 -k2,2n -k3,3n -k4,4n -k5,5n | tail -1 
        echo::set-env name=TAG_NAME::$(grep 'v' props.json |  sort -bt. -k1,1 -k2,2n -k3,3n -k4,4n -k5,5n | tail -1)
        echo "LATEST=$(grep 'v' props.json |  sort -bt. -k1,1 -k2,2n -k3,3n -k4,4n -k5,5n | tail -1)"  >> $GITHUB_OUTPUT
+       echo "GREETING=Hello"  >> $GITHUB_OUTPUT
     - name: Output latest
       run: | 
         echo "tna-judgments-parser is at version ${{steps.echo-value.LATEST}}"
+        echo "say ${{steps.echo-value.GREETING}}"
         echo "tna-judgments-parsers is at version ${{env.TAG_NAME}}"
     
     
