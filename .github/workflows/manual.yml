@@ -52,8 +52,8 @@ jobs:
        echo "GREETING=Hello"  >> $GITHUB_OUTPUT
     - name: Output latest
       run: | 
-        echo "tna-judgments-parser is at version ${{steps.echo-value.LATEST}}"
-        echo "say ${{steps.echo-value.GREETING}}"
+        echo "tna-judgments-parser is at version ${{steps.echo-value.outputs.LATEST}}"
+        echo "say ${{steps.echo-value.outputs.GREETING}}"
         echo "tna-judgments-parsers is at version ${{env.TAG_NAME}}"
     
     
