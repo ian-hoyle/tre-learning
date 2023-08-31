@@ -60,12 +60,12 @@ jobs:
        
 #       echo "platform=${{fromJson(steps.read-json.outputs.config).court_document_parse_image_versions.tre_court_document_parse}}" 
 #      ./.github/scripts/check_version.sh ${{ steps.octokit.outputs.tag }} v0.16.3
-#    - name: Update json-values description
-#      uses: jossef/action-set-json-field@v2.1
-#      with:
-#        file: ./terraform/staging.tfvars.json
-#        field: court_document_parse_version
-#        value: vGOOD
+    - name: Update json-values description
+      uses: jossef/action-set-json-field@v2.1
+      with:
+        file: ./terraform/staging.tfvars.json
+        field: court_document_parse_version
+        value: HAPPY
 #    - name: Commit files
 #      run: |
 #        git config --local user.email "action@github.com"
