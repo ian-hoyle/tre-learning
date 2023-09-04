@@ -38,31 +38,55 @@ jobs:
       id: read-json
       run: | # to read multi-line JSON file and not bother with escaping
           echo "config<<EOF" >> $GITHUB_OUTPUT
-          cat ./terraform/staging.tfvars.json >> $GITHUB_OUTPUT
+          cat ./terraform/ids.json >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
     - name: End 
       id: echo-value
       run: |
-       echo "platform=${{fromJson(steps.read-json.outputs.config).court_document_parse_image_versions.tre_court_document_parse}}" 
-       ./.github/scripts/check_version.sh ${{ steps.octokit.outputs.tag }} v0.16.3
+       echo "${{toJson(fromJson(steps.read-json.outputs.config).imageIds.*.imageTag)}}" >> props.json
+       cat props.json
+       echo "::set-output name=LATEST_VERSION::$(
+       grep 'v' props.json |  sort -bt. -k1,1 -k2,2n -k3,3n -k4,4n -k5,5n | tail -1 )"
+       grep v props.json |  sort -bt. -k1,1 -k2,2n -k3,3n -k4,4n -k5,5n | tail -1 
+       echo "LATEST=$(grep 'v' props.json | sed 's/,//' |  sort -bt. -k1,1 -k2,2n -k3,3n -k4,4n -k5,5n | tail -1)"  >> $GITHUB_OUTPUT
+       echo "GREETING=Hello"  >> $GITHUB_OUTPUT
+    - name: Output latest
+      run: | 
+        echo "tna-judgments-parser is at version ${{steps.echo-value.outputs.LATEST}}"
+        echo "say ${{steps.echo-value.outputs.GREETING}}"
+        
+    
+    
+       
+#       echo "platform=${{fromJson(steps.read-json.outputs.config).court_document_parse_image_versions.tre_court_document_parse}}" 
+#      ./.github/scripts/check_version.sh ${{ steps.octokit.outputs.tag }} v0.16.3
     - name: Update json-values description
       uses: jossef/action-set-json-field@v2.1
       with:
         file: ./terraform/staging.tfvars.json
         field: court_document_parse_version
-        value: vGOOD
-    - name: Commit files
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add -A
-        git commit -m "docs(): bumping release "
-      #  git tag ${{ steps.semantic_release_info.outputs.git_tag }}
-        
-    - name: Push changes
-      uses: ad-m/github-push-action@v0.6.0
+        value: HAPPY
+    - name: check
+      uses: actions/update-allowed@v1
       with:
-        github_token: ${{ github.token }}
+         current-tag: "v1"
+         new-tag: "v2"
+    - name: test
+      run: |
+        echo "worked ${{ steps.update.outputs.update-suggested }}"
+     
+    # - name: Commit files
+    #   run: |
+    #    git config --local user.email "action@github.com"
+    #    git config --local user.name "GitHub Action"
+    #    git add -A
+    #    git commit -m "docs(): bumping release "
+#      #  git tag ${{ steps.semantic_release_info.outputs.git_tag }}
+#
+    # - name: Push changes
+    #   uses: ad-m/github-push-action@v0.6.0
+    #   with:
+    #    github_token: ${{ github.token }}
        # tags: true
       
     
