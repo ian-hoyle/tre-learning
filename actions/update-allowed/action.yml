@@ -1,0 +1,25 @@
+# Action to check if a version upgrade is allowed
+name: 'Update suggested'
+description: 'Should the version be updated'
+inputs:
+  current-tag:
+    description: 'The tag of the version to compare with'
+    required: true
+  new-tag:
+    description: 'The new tag version to check'
+    required: false
+outputs:
+  update-suggested:
+    description: The return value of the check_version script
+    value: ${{ steps.update.outputs.update-suggested }}
+runs:
+  using: "composite"
+  steps:
+    - name: update check
+      id: update
+      shell: bash
+      run: |
+        printf '$inputs.current-tag=%s\n' "${{ inputs.current-tag }}"
+        ./check_version.sh ${{ inputs.current-tag }} ${{ inputs.new-tag }}
+        echo "update-suggested=$?" >> $GITHUB_OUTPUT
+
