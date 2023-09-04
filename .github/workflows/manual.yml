@@ -67,7 +67,7 @@ jobs:
         field: court_document_parse_version
         value: HAPPY
     - name: check
-      uses: ian-hoyle/tre-learning/.github/actions/dupdate-allowed@v2
+      uses: ian-hoyle/tre-learning/.github/actions/update-allowed@v2
       with:
          current-tag: "v1"
          new-tag: "v2"
