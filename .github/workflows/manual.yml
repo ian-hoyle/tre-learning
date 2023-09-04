@@ -25,7 +25,7 @@ jobs:
     name: Dispatch  
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - uses: oprypin/find-latest-tag@v1
     
       with:
@@ -67,7 +67,7 @@ jobs:
         field: court_document_parse_version
         value: HAPPY
     - name: check
-      uses: ./.github/actions/update-allowed
+      uses: ./actions/update-allowed
       with:
          current-tag: "v1.1"
          new-tag: "v1.2"
