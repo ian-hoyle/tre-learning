@@ -25,5 +25,6 @@ runs:
         ./.github/scripts/check_version.sh ${{ inputs.current-tag }} ${{ inputs.new-tag }}
         echo "update-suggested=$?" >> $GITHUB_OUTPUT
     - name: test
+      shell: bash
       run: |
         echo "worked ${{ steps.update.outputs.update-suggested}}"
