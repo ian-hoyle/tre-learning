@@ -66,18 +66,27 @@ jobs:
         file: ./terraform/staging.tfvars.json
         field: court_document_parse_version
         value: HAPPY
-    - name: Commit files
+    - name: check
+      uses: actions/update-allowed@v1
+      with:
+         current-tag: "v1"
+         new-tag: "v2"
+    - name: test
       run: |
-       git config --local user.email "action@github.com"
-       git config --local user.name "GitHub Action"
-       git add -A
-       git commit -m "docs(): bumping release "
+        echo "worked ${{ steps.update.outputs.update-suggested }}"
+     
+    # - name: Commit files
+    #   run: |
+    #    git config --local user.email "action@github.com"
+    #    git config --local user.name "GitHub Action"
+    #    git add -A
+    #    git commit -m "docs(): bumping release "
 #      #  git tag ${{ steps.semantic_release_info.outputs.git_tag }}
 #
-    - name: Push changes
-      uses: ad-m/github-push-action@v0.6.0
-      with:
-       github_token: ${{ github.token }}
+    # - name: Push changes
+    #   uses: ad-m/github-push-action@v0.6.0
+    #   with:
+    #    github_token: ${{ github.token }}
        # tags: true
       
     
