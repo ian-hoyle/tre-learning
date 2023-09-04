@@ -67,7 +67,7 @@ jobs:
         field: court_document_parse_version
         value: HAPPY
     - name: check
-      uses: ./.github/actions/update-allowed
+      uses: ./actions/update-allowed
       with:
          current-tag: "v1.1"
          new-tag: "v1.2"
