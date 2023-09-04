@@ -69,8 +69,8 @@ jobs:
     - name: check
       uses: ./.github/actions/update-allowed
       with:
-         current-tag: "v1"
-         new-tag: "v2"
+         current-tag: "v1.1"
+         new-tag: "v1.2"
     - name: test
       run: |
         echo "worked ${{ steps.update.outputs.update-suggested }}"
