@@ -1,5 +1,4 @@
-# Action to get the next version number for a specified repository. An
-# optional version suffix can be supplied (e.g. "beta" for "1.2.3-beta")
+# Action to check if a version upgrade is allowed
 name: 'Update suggested'
 description: 'Should the version be updated'
 inputs:
@@ -11,7 +10,7 @@ inputs:
     required: false
 outputs:
   update-suggested:
-    description: The next version for the repository
+    description: The return value of the check_version script
     value: ${{ steps.update.outputs.update-suggested }}
 runs:
   using: "composite"
@@ -20,11 +19,7 @@ runs:
       id: update
       shell: bash
       run: |
-        printf 'github.action_path=%s\n' "${{ github.action_path }}"
         printf '$inputs.current-tag=%s\n' "${{ inputs.current-tag }}"
-        ./.github/scripts/check_version.sh ${{ inputs.current-tag }} ${{ inputs.new-tag }}
+        ./check_version.sh ${{ inputs.current-tag }} ${{ inputs.new-tag }}
         echo "update-suggested=$?" >> $GITHUB_OUTPUT
-    # - name: test
-    #   shell: bash
-    #   run: |
-    #     echo "worked ${{ steps.update.outputs.update-suggested}}"
+
