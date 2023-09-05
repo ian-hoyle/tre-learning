@@ -26,6 +26,7 @@ runs:
         role-session-name: role-session-name-${{ github.actor }}-${{ github.triggering_actor }}
     - name: describe images  
       id: image-versions
+      shell: bash
       run: |
         aws ecr list-images --repository-name="${{inputs.ecr_registry_path}}" --filter tagStatus=TAGGED > images.json
         echo "images<<EOF" >> $GITHUB_OUTPUT
@@ -33,6 +34,7 @@ runs:
         echo "EOF" >> $GITHUB_OUTPUT 
     - name: Check if version deployed
       id: deployed
+      shell: bash
       run: |  
         echo "{}" >> ecr-tags.json  
         if [ "$(grep -c imageTag image-versions.json)" != 0 ]; then echo "${{toJson(fromJson(steps.image-versions.outputs.images).imageIds.*.imageTag)}}" >> ecr-tags.json ; fi
