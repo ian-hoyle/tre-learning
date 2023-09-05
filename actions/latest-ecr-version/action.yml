@@ -6,7 +6,6 @@ inputs:
     type: string
     required: true
     default: "tre-v2/tre-vb-bag-files-validation"
-secrets:    
   aws-role:
     required: true
     description: 'AWS role allowed to read ECR' 
