@@ -16,7 +16,6 @@ runs:
   using: "composite"
   steps:
     - name: login
-      shell: bash
       uses: aws-actions/configure-aws-credentials@v3
       with:
         role-to-assume: ${{ inputs.aws-role }}
