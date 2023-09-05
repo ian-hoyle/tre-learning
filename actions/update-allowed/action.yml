@@ -20,10 +20,7 @@ runs:
     - id: update
       shell: bash
       run: |
-        ls -ltr
-        echo "hello"
-        ls -ltr ${{ github.action_path }}
-        printf '$inputs.current-tag=%s\n' "${{ inputs.current-tag }}"
+        echo "current tag ${{ inputs.current-tag }} new tag ${{ inputs.new-tag }}"
         check_version.sh ${{ inputs.current-tag }} ${{ inputs.new-tag }}
         echo "update-suggested=$?" >> $GITHUB_OUTPUT
 
