@@ -26,18 +26,18 @@ runs:
       shell: bash
       run: |
         if [[ $(aws ecr describe-repositories \
-          --region "${{ inputs.aws-region }}" \
+          --region eu-west-2 \
           --repository-names "${{ inputs.ecr_registry_path }}" \
         ) ]]; then
          printf 'Repository "%s" already exists' "${{inputs.ecr_registry_path}}"
          echo "created=0" >> $GITHUB_OUTPUT 
         else
            printf 'Creating repository "%s"' "${{inputs.ecr_registry_path}}"
-           aws ecr create-repository \
-          --region "${{ inputs.aws-region }}" \
-          --repository-name "${{inputs.ecr_registry_path}}" \
-          --image-scanning-configuration \
-          scanOnPush=true;
+          #  aws ecr create-repository \
+          # --region eu-west-2 \
+          # --repository-name "${{inputs.ecr_registry_path}}" \
+          # --image-scanning-configuration \
+          # scanOnPush=true;
           echo "created=1" >> $GITHUB_OUTPUT
         fi
        
