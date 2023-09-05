@@ -36,9 +36,9 @@ runs:
       id: deployed
       shell: bash
       run: |  
-        echo "{}" >> ecr-tags.json  
+        echo "{}" > ecr-tags.json  
         if [ "$(grep -c imageTag images.json)" != 0 ]; then
-         echo "${{toJson(fromJson(steps.image-versions.outputs.images).imageIds.*.imageTag)}}" >> ecr-tags.json ;
+         echo "${{toJson(fromJson(steps.image-versions.outputs.images).imageIds.*.imageTag)}}" > ecr-tags.json ;
         fi
         if [ "$(grep -c \"${{ inputs.new-tag}}\" ecr-tags.json)" == 1 ] || [ "$(grep -c ${{ inputs.aws-role }} ecr-tags.json)" == 1 ]; then
          echo "version-deployed=1" >> $GITHUB_OUTPUT ; 
