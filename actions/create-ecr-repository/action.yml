@@ -5,6 +5,7 @@ inputs:
   ecr_registry_path:
     type: string
     required: true
+secrets:
   aws-role:
     required: true
     description: 'AWS role allowed to read ECR' 
@@ -18,7 +19,7 @@ runs:
     - name: login
       uses: aws-actions/configure-aws-credentials@v3
       with:
-        role-to-assume: ${{ inputs.aws-role }}
+        role-to-assume: ${{ secrets.aws-role }}
         aws-region: eu-west-2
         role-session-name: role-session-name-${{ github.actor }}-${{ github.triggering_actor }}
     - name: create repository it required
