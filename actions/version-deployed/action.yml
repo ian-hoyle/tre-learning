@@ -9,6 +9,7 @@ inputs:
   new-tag:
     description: 'The new tag version to check'
     required: false
+secrets:    
   aws-role:
     description: 'AWS role allowed to read ECR' 
 outputs:
@@ -21,7 +22,7 @@ runs:
     - name: login
       uses: aws-actions/configure-aws-credentials@v3
       with:
-        role-to-assume: ${{ inputs.aws-role }}
+        role-to-assume: ${{ secrets.aws-role }}
         aws-region: eu-west-2
         role-session-name: role-session-name-${{ github.actor }}-${{ github.triggering_actor }}
     - name: describe images  
