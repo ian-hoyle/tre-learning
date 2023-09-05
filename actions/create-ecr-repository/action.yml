@@ -1,0 +1,45 @@
+# Action to check if a version has been deployed
+name: 'Version deployed'
+description: 'Checks if version has been deployed'
+inputs:
+  ecr_registry_path:
+    type: string
+    required: true
+  aws-role:
+    required: true
+    description: 'AWS role allowed to read ECR' 
+outputs:
+  created:
+    description: Returns 1 if created
+    value: ${{ steps.create.outputs.created }}
+runs:
+  using: "composite"
+  steps:
+    - name: login
+      shell: bash
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        role-to-assume: ${{ inputs.aws-role }}
+        aws-region: eu-west-2
+        role-session-name: role-session-name-${{ github.actor }}-${{ github.triggering_actor }}
+    - name: create repository it required
+      id: create
+      shell: bash
+      run: |
+        if [[ $(aws ecr describe-repositories \
+          --region "${{ inputs.aws-region }}" \
+          --repository-names "${{ inputs.ecr_registry_path }}" \
+        ) ]]; then
+         printf 'Repository "%s" already exists' "${{inputs.ecr_registry_path}}"
+         echo "created=0" >> $GITHUB_OUTPUT 
+        else
+           printf 'Creating repository "%s"' "${{inputs.ecr_registry_path}}"
+           aws ecr create-repository \
+          --region "${{ inputs.aws-region }}" \
+          --repository-name "${{inputs.ecr_registry_path}}" \
+          --image-scanning-configuration \
+          scanOnPush=true;
+          echo "created=1" >> $GITHUB_OUTPUT
+        fi
+       
+   
