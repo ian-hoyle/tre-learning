@@ -1,0 +1,44 @@
+# Action to get latest pushed image
+name: 'Version deployed'
+description: 'latest pushed image'
+inputs:
+  ecr_registry_path:
+    type: string
+    required: true
+    default: "tre-v2/tre-vb-bag-files-validation"
+  aws-role:
+    required: true
+    description: 'AWS role allowed to read ECR' 
+outputs:
+  latest-version:
+    description: latest version
+    value: ${{ steps.latest.outputs.latest-version }}
+runs:
+  using: "composite"
+  steps:
+    - name: login
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        role-to-assume: ${{ inputs.aws-role }}
+        aws-region: eu-west-2
+        role-session-name: role-session-name-${{ github.actor }}-${{ github.triggering_actor }}
+    - name: Get latest image details    
+      id: latest-ecr-version-file
+      shell: bash
+      run: |
+        aws ecr describe-images --repository-name "${{inputs.ecr_registry_path}}" --filter tagStatus=TAGGED --query 'sort_by(imageDetails,& imagePushedAt)[-1]' > ecr_versions.json
+        echo "latest-image<<EOF" >> $GITHUB_OUTPUT
+        cat ecr_versions.json >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+    - name: get latest version
+      id: latest
+      shell: bash
+      run: |      
+        cat ecr_versions.json
+        echo "latest-version=${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}}" >> $GITHUB_OUTPUT
+        if [ ${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}} == "latest" ];  then 
+          echo "latest-version=${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[1]}}" >> $GITHUB_OUTPUT ;
+        fi
+      
+       
+   
