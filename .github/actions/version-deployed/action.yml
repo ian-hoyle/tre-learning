@@ -9,7 +9,6 @@ inputs:
   new-tag:
     description: 'The new tag version to check'
     required: false
-secrets:    
   aws-role:
     description: 'AWS role allowed to read ECR' 
 outputs:
