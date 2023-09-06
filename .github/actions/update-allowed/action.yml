@@ -15,11 +15,12 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: update check
-      id: update
+    - run: echo "${{ github.action_path }}" >> $GITHUB_PATH
+      shell: bash
+    - id: update
       shell: bash
       run: |
-        printf '$inputs.current-tag=%s\n' "${{ inputs.current-tag }}"
-        ./check_version.sh ${{ inputs.current-tag }} ${{ inputs.new-tag }}
+        echo "current tag ${{ inputs.current-tag }} new tag ${{ inputs.new-tag }}"
+        check_version.sh ${{ inputs.current-tag }} ${{ inputs.new-tag }}
         echo "update-suggested=$?" >> $GITHUB_OUTPUT
 

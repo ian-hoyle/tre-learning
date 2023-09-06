@@ -1,0 +1,50 @@
+# Action to check if a version has been deployed
+name: 'Version deployed'
+description: 'Checks if version has been deployed'
+inputs:
+  ecr_registry_path:
+    type: string
+    required: true
+    default: "tre-v2/tre-vb-bag-files-validation"
+  new-tag:
+    description: 'The new tag version to check'
+    required: false
+secrets:    
+  aws-role:
+    description: 'AWS role allowed to read ECR' 
+outputs:
+  version-deployed:
+    description: Returns 1 if deployed
+    value: ${{ steps.deployed.outputs.version-deployed }}
+runs:
+  using: "composite"
+  steps:
+    - name: login
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        role-to-assume: ${{ secrets.aws-role }}
+        aws-region: eu-west-2
+        role-session-name: role-session-name-${{ github.actor }}-${{ github.triggering_actor }}
+    - name: describe images  
+      id: image-versions
+      shell: bash
+      run: |
+        aws ecr list-images --repository-name="${{inputs.ecr_registry_path}}" --filter tagStatus=TAGGED > images.json
+        echo "images<<EOF" >> $GITHUB_OUTPUT
+        cat images.json >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT 
+    - name: Check if version deployed
+      id: deployed
+      shell: bash
+      run: |  
+        echo "{}" > ecr-tags.json  
+        if [ "$(grep -c imageTag images.json)" != 0 ]; then
+         echo "${{toJson(fromJson(steps.image-versions.outputs.images).imageIds.*.imageTag)}}" > ecr-tags.json ;
+        fi
+        if [ "$(grep -c \"${{ inputs.new-tag}}\" ecr-tags.json)" == 1 ] || [ "$(grep -c ${{ inputs.aws-role }} ecr-tags.json)" == 1 ]; then
+         echo "version-deployed=1" >> $GITHUB_OUTPUT ; 
+        else
+         echo "version-deployed=0" >> $GITHUB_OUTPUT ;
+        fi
+       
+   
