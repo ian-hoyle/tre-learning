@@ -36,6 +36,9 @@ runs:
       run: |      
         cat ecr_versions.json
         echo "latest-version=${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}}" >> $GITHUB_OUTPUT
+        if [ ${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}} == "" ];  then 
+          echo "latest-version=v0.0" >> $GITHUB_OUTPUT ;
+        fi
         if [ ${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}} == "latest" ];  then 
           echo "latest-version=${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[1]}}" >> $GITHUB_OUTPUT ;
         fi
