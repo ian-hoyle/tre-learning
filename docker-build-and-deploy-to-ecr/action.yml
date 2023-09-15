@@ -1,0 +1,82 @@
+# Action to build then push a given Docker image to ECR, creating the
+# repository name in ECR first if it does not exist.
+name: 'Docker build and deploy to ECR'
+description: 'Push Docker image to ECR, creating repository if necessary'
+inputs:
+  dockerfile-dir:
+    description: 'The directory containing the Docker file to build; e.g. "build-dir"'
+    required: true
+  docker-file:
+      description: 'Optional path to Dockerfile'
+      required: false
+  image-name:
+    description: 'The name of the Docker image to push; e.g. "some-image"'
+    required: true
+  image-version:
+    description: 'The version of the Docker image to push; e.g. "1.2.3"'
+    required: true
+  ecr-registry-path:
+    description: 'The path part of the repository name; i.e. the "alpha" in "alpha/docker-image-name"'
+    required: true
+  aws-region:
+    description: 'AWS region'
+    required: true
+  pip-index-file:
+    description: 'Optional file containing pip index url to be supplied as a docker build argument'
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - name: AWS ECR login
+      id: aws-ecr-login
+      uses: aws-actions/amazon-ecr-login@v1
+    - name: Docker build and tag
+      shell: bash
+      env:
+        REGISTRY: ${{ steps.aws-ecr-login.outputs.registry }}
+        REGISTRY_PATH: ${{ inputs.ecr-registry-path }}
+        IMAGE_NAME: ${{ inputs.image-name }}
+        IMAGE_VERSION: ${{ inputs.image-version }}
+        ECR_REPOSITORY_NAME: ${{ inputs.ecr-registry-path }}/${{ inputs.image-name }}
+      run: |
+        docker images
+        build_arg=""
+         
+        if [ -n "${{ inputs.pip-index-file }}" ]; then
+          pip_index_file_contents=$(cat "${{ inputs.pip-index-file }}")
+          build_arg="--build-arg PIP_INDEX_URL=$pip_index_file_contents"
+        fi
+        
+        if [ -n "${{ inputs.docker-file }}" ] &&; then
+           build_arg += " -f ${{ inputs.docker-file }}"
+        fi
+        docker build \
+        $build_arg \
+        --tag "${REGISTRY}/${REGISTRY_PATH}/${IMAGE_NAME}:${IMAGE_VERSION}" \
+        "${{ inputs.dockerfile-dir }}"
+        docker images
+    - name: 'AWS ECR docker push'
+      shell: bash
+      env:
+        REGISTRY: ${{ steps.aws-ecr-login.outputs.registry }}
+        REGISTRY_PATH: ${{ inputs.ecr-registry-path }}
+        IMAGE_NAME: ${{ inputs.image-name }}
+        IMAGE_TAG: ${{ inputs.image-version }}
+        ECR_REPOSITORY_NAME: ${{ inputs.ecr-registry-path }}/${{ inputs.image-name }}
+      run: |
+        # Create ECR repository if it doesn't exist
+        if [[ $(aws ecr describe-repositories \
+          --region "${{ inputs.aws-region }}" \
+          --repository-names "${ECR_REPOSITORY_NAME}" \
+        ) ]]; then
+          printf 'Repository "%s" already exists' "${ECR_REPOSITORY_NAME}"
+        else
+          printf 'Creating repository "%s"' "${ECR_REPOSITORY_NAME}"
+          aws ecr create-repository \
+            --region "${{ inputs.aws-region }}" \
+            --repository-name "${ECR_REPOSITORY_NAME}" \
+            --image-scanning-configuration \
+            scanOnPush=true
+        fi
+
+        docker push "${REGISTRY}/${REGISTRY_PATH}/${IMAGE_NAME}:${IMAGE_TAG}"
