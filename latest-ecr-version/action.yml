@@ -34,7 +34,6 @@ runs:
       id: latest
       shell: bash 
       run: |      
-        cat ecr_versions.json
         echo "im updated"
         if  [ $(wc -l < "${ecr_versions.json}") -eq 0 ] ; then
           echo "wow" 
