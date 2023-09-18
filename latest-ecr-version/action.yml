@@ -33,14 +33,16 @@ runs:
     - name: get latest version
       id: latest
       shell: bash 
-      run: |
-        echo "latest-version=0.0" >> $GITHUB_OUTPUT
-      if: toJson(fromJson(steps.latest-ecr-version-file.outputs.latest-image)) != "{}"
       run: |      
         cat ecr_versions.json
-        echo "latest-version=${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}}" >> $GITHUB_OUTPUT
-        if [ ${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}} == "latest" ];  then 
-          echo "latest-version=${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[1]}}" >> $GITHUB_OUTPUT ;
+        if [ "$(grep -c imageTags ecr_versions.json)" == 0 ]; then
+          echo "latest-version=0.0" >> $GITHUB_OUTPUT
+        fi
+        if [ "$(grep -c imageTags ecr_versions.json)" != 0 ]; then
+           echo "latest-version=${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}}" >> $GITHUB_OUTPUT
+        fi
+        if [ "$(grep -c imageTags ecr_versions.json)" > 1 ] && [ ${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}} == "latest" ];  then 
+           echo "latest-version=${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[1]}}" >> $GITHUB_OUTPUT ;
         fi
       
        
