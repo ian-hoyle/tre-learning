@@ -35,7 +35,8 @@ runs:
       shell: bash 
       run: |      
         cat ecr_versions.json
-         if  [ $(wc -l < "${ecr_versions.json}") -eq 0 ] ; then
+        echo "im updated"
+        if  [ $(wc -l < "${ecr_versions.json}") -eq 0 ] ; then
           echo "wow" 
         fi
         if ! [ "$(-f ecr_versions.json)" ] || [ $(wc -l < "${ecr_versions.json}") -eq 0 ]  ; then
