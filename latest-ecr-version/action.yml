@@ -35,13 +35,13 @@ runs:
       shell: bash 
       run: |      
         cat ecr_versions.json
-        if [ "$(grep -c imageTags ecr_versions.json)" == 0 ]; then
+        if ![ -f ecr_versions.json ] || [ "$(grep -c imageTags ecr_versions.json)" == 0 ]; then
           echo "latest-version=0.0" >> $GITHUB_OUTPUT
         fi
-        if [ "$(grep -c imageTags ecr_versions.json)" != 0 ]; then
+        if [ -f ecr_versions.json ]; then
            echo "latest-version=${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}}" >> $GITHUB_OUTPUT
         fi
-        if [ "$(grep -c imageTags ecr_versions.json)" -gt 1 ] && [ ${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}} == "latest" ];  then 
+        if [ -f ecr_versions.json ] && [ "$(grep -c imageTags ecr_versions.json)" -gt 1 ] && [ ${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}} == "latest" ];  then 
            echo "latest-version=${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[1]}}" >> $GITHUB_OUTPUT ;
         fi
       
