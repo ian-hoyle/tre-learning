@@ -35,6 +35,15 @@ runs:
       shell: bash 
       run: |      
         cat ecr_versions.json
+        if ! [ "$(-f ecr_versions.json)" ]; then
+          echo "file not exists with dollar -f ecr_versions.json" 
+        fi
+        if ! [ -f ecr_versions.json ]; then
+          echo "file not exists no dollar no quote" 
+        fi
+        if ! [ "-f ecr_versions.json" ]; then
+          echo "file not exists quotes" 
+        fi
         if ![ "$(-f ecr_versions.json)" ]; then
           echo "latest-version=0.0" >> $GITHUB_OUTPUT
         fi
