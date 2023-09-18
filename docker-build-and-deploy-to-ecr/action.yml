@@ -47,7 +47,7 @@ runs:
           build_arg="--build-arg PIP_INDEX_URL=$pip_index_file_contents"
         fi
         
-        if [ -n "${{ inputs.docker-file }}" ] &&; then
+        if [ -n "${{ inputs.docker-file }}" ]; then
            build_arg += " -f ${{ inputs.docker-file }}"
         fi
         docker build \
