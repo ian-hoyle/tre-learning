@@ -26,32 +26,21 @@ runs:
       id: latest-ecr-version-file
       shell: bash
       run: |
-        echo "A"
         aws ecr describe-images --repository-name "${{inputs.ecr_registry_path}}" --filter tagStatus=TAGGED --query 'sort_by(imageDetails,& imagePushedAt)[-1]' > ecr_versions.json
         echo "latest-image<<EOF" >> $GITHUB_OUTPUT
         cat ecr_versions.json >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
-        echo "B"
     - name: get latest version
       id: latest
       shell: bash 
       run: |      
-        echo "im updated"
-        if  [ $(wc -l < ecr_versions.json) != 0 ] ; then
-          echo "wow" 
-        fi
-        if ! [ "$(-f ecr_versions.json)" ] || [ $(wc -l < ecr_versions.json ) != 0 ]  ; then
-          echo "file not exists with dollar -f ecr_versions.json" 
-        fi
         if ! [ "$(-f ecr_versions.json)" ]; then
           echo "latest-version=0.0" >> $GITHUB_OUTPUT
         fi
         if [ "$(-f ecr_versions.json)" ]; then
-          echo "C"
            echo "latest-version=${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}}" >> $GITHUB_OUTPUT
         fi
-        if [ "$(-f ecr_versions.json)" ] && [ "$(grep -c imageTags ecr_versions.json)" -gt 1 ] && [ ${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}} == "latest" ];  then 
-           echo "last" 
+        if [ "$(-f ecr_versions.json)" ] && [ "$(grep -c imageTags ecr_versions.json)" > 1 ] && [ ${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}} == "latest" ];  then 
            echo "latest-version=${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[1]}}" >> $GITHUB_OUTPUT ;
         fi
       
