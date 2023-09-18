@@ -48,7 +48,7 @@ runs:
         fi
         
         if [ -n "${{ inputs.docker-file }}" ]; then
-           build_arg += " -f ${{ inputs.docker-file }}"
+           build_arg+=" -f ${{ inputs.docker-file }}"
         fi
         docker build \
         $build_arg \
