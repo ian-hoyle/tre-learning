@@ -1,6 +1,6 @@
 # Action to get latest pushed image
-name: 'Version deployed'
-description: 'latest pushed image'
+name: 'Get latest deployed'
+description: 'Gets the tag of the latest pushed image or 0.0 if no image or latest image not tagged'
 inputs:
   ecr_registry_path:
     type: string
@@ -32,13 +32,13 @@ runs:
         echo "EOF" >> $GITHUB_OUTPUT
     - name: get latest version
       id: latest
-      shell: bash
+      shell: bash 
+      run: |
+        echo "latest-version=0.0" >> $GITHUB_OUTPUT
+      if: toJson(fromJson(steps.latest-ecr-version-file.outputs.latest-image)) != "{}"
       run: |      
         cat ecr_versions.json
         echo "latest-version=${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}}" >> $GITHUB_OUTPUT
-        if [ ${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}} == "" ];  then 
-          echo "latest-version=v0.0" >> $GITHUB_OUTPUT ;
-        fi
         if [ ${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[0]}} == "latest" ];  then 
           echo "latest-version=${{fromJson(steps.latest-ecr-version-file.outputs.latest-image).imageTags[1]}}" >> $GITHUB_OUTPUT ;
         fi
