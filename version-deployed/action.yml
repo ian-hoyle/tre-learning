@@ -37,10 +37,10 @@ runs:
       shell: bash
       run: |  
         echo "{}" > ecr-tags.json  
-        if [ "$(grep -c imageTag images.json)" != 0 ]; then
+        if ![ "$(grep -c imageTag images.json)" -eq 0 ]; then
          echo "${{toJson(fromJson(steps.image-versions.outputs.images).imageIds.*.imageTag)}}" > ecr-tags.json ;
         fi
-        if [ "$(grep -c \"${{ inputs.new-tag}}\" ecr-tags.json)" == 1 ] || [ "$(grep -c ${{ inputs.aws-role }} ecr-tags.json)" == 1 ]; then
+        if [ "$(grep -c \"${{ inputs.new-tag}}\" ecr-tags.json)" -eq 1 ] || [ "$(grep -c ${{ inputs.aws-role }} ecr-tags.json)" -eq 1 ]; then
          echo "version-deployed=1" >> $GITHUB_OUTPUT ; 
         else
          echo "version-deployed=0" >> $GITHUB_OUTPUT ;
