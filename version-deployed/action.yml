@@ -40,7 +40,7 @@ runs:
         if ! [ "$(grep -c imageTag images.json)" -eq 0 ]; then
          echo "${{toJson(fromJson(steps.image-versions.outputs.images).imageIds.*.imageTag)}}" > ecr-tags.json ;
         fi
-        if [ "$(grep -c \"${{ inputs.new-tag}}\" ecr-tags.json)" -eq 1 ] || [ "$(grep -c ${{ inputs.new-tag }} ecr-tags.json)" -eq 1 ]; then
+        if [ "$(grep -c ${{ inputs.new-tag }} ecr-tags.json)" -eq 1 ]; then
          echo "deployed"
          echo "version-deployed=1" >> $GITHUB_OUTPUT ; 
         else
