@@ -16,6 +16,8 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks latest tag in repository
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Update package.json version
         uses: jossef/action-set-json-field@v2.1
         with:
