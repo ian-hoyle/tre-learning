@@ -17,7 +17,7 @@ jobs:
     steps:
       # Checks latest tag in repository
       - name: Update package.json version
-      - uses: jossef/action-set-json-field@v2.1
+        uses: jossef/action-set-json-field@v2.1
         with:
           file: ../terraform/staging.tfvars
           field: vb_version
