@@ -26,5 +26,5 @@ jobs:
       - uses: jossef/action-set-json-field@v2.1
         with:
           file: ../terraform/staging.tfvars
-          field: version
+          field: vb_version
           value: "hello" 
