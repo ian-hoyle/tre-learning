@@ -18,7 +18,7 @@
         id: checkout_branch
         uses: peterjgrainger/action-create-branch@v2.2.0
         env:
-          GITHUB_TOKEN: ${{ secrets.github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           branch: 'release-notes'
       -  name: Update json-values description
@@ -37,5 +37,5 @@
       - name: Push changes
         uses: ad-m/github-push-action@v0.6.0
         with:
-         github_token: ${{ secrets.github.token }}
+         github_token: ${{ secrets.GITHUB_TOKEN }}
          branch: 'release-notes'   
