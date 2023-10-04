@@ -27,3 +27,14 @@
            file: "${{ inputs.file_name }}"
            field: "${{ inputs.field}}"
            value: "${{ inputs.value }}"
+      - name: Commit files
+        run: |
+         git config --local user.email "action@github.com"
+         git config --local user.name "GitHub Action"
+         git add -A
+         git commit -m "docs(): bumping release "
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+         github_token: ${{ github.token }}
+         branch: 'release-notes'   
