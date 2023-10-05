@@ -9,6 +9,7 @@ name: Labeler
 permissions:
   contents: read
   issues: write
+  id-token: write
   
 on:
   # Allows you to run this workflow manually from the Actions tab
