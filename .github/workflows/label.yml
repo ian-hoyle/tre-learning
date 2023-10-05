@@ -7,8 +7,8 @@
 
 name: Labeler
 permissions:
-  actions: write
-  checks: write
+  # actions: write
+  # checks: write
   contents: write
   # deployments: write
   # discussions: write
