@@ -57,4 +57,4 @@
           -f head=update_json_${{ inputs.field }} \
           -f base='main'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ inputs.token }}
