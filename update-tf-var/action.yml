@@ -46,6 +46,7 @@
          github_token: ${{ inputs.token }}
          branch: update_json_${{ inputs.field }}
       - name: Create Pull Request
+        shell: bash
         run: |
           gh api \
           --method POST \
