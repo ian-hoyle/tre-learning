@@ -39,7 +39,7 @@
          git config --local user.email "action@github.com"
          git config --local user.name "GitHub Action"
          git add -A
-         git commit -m "updating ${{ inputs.field }} with ${{ inputs_value }}"
+         git commit -m "updating ${{ inputs.field }} with ${{ inputs.value }}"
       - name: Push changes
         uses: ad-m/github-push-action@v0.6.0
         with:
