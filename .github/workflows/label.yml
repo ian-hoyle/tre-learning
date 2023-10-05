@@ -10,9 +10,9 @@ permissions:
   actions: write
   checks: write
   contents: write
-  deployments: write
+  # deployments: write
   # discussions: write
-  issues: write
+  # issues: write
   id-token: write
   # packages: write
   # pages: write
