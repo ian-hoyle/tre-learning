@@ -6,10 +6,23 @@
 # https://github.com/actions/labeler
 
 name: Labeler
-# permissions:
-#   contents: read
-#   issues: write
-#   id-token: write
+permissions:
+  actions: write
+  # Checks: write
+  # Contents: write
+  # Deployments: write
+  # Discussions: write
+  # Issues: write
+  # Metadata: read
+  # Packages: write
+  # Pages: write
+  # PullRequests: write
+  # RepositoryProjects: write
+  # SecurityEvents: write
+  # Statuses: write
+  contents: read
+  issues: write
+  id-token: write
   
 on:
   # Allows you to run this workflow manually from the Actions tab
