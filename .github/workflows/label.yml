@@ -8,22 +8,19 @@
 name: Labeler
 permissions:
   actions: write
-  # Checks: write
-  # Contents: write
-  # Deployments: write
-  # Discussions: write
-  # Issues: write
-  # Metadata: read
-  # Packages: write
-  # Pages: write
-  # PullRequests: write
-  # RepositoryProjects: write
-  # SecurityEvents: write
-  # Statuses: write
-  contents: read
+  checks: write
+  contents: write
+  deployments: write
+  discussions: write
   issues: write
-  id-token: write
-  
+  id-token: read
+  packages: write
+  pages: write
+  pull-requests: write
+  repository-projects: write
+  security-events: write
+  statuses: write
+    
 on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
