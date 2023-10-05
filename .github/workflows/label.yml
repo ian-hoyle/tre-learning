@@ -14,12 +14,12 @@ permissions:
   discussions: write
   issues: write
   id-token: write
-  packages: write
-  pages: write
+  # packages: write
+  # pages: write
   pull-requests: write
-  repository-projects: write
-  security-events: write
-  statuses: write
+  # repository-projects: write
+  # security-events: write
+  # statuses: write
     
 on:
   # Allows you to run this workflow manually from the Actions tab
