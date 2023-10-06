@@ -10,9 +10,13 @@
     value:
       type: string
       required: true
-    token:
+    github_token:
       type: string
       required: true
+  outputs:
+    branch:
+      description: branch name containing updated values
+      value: ${{ steps.latest.outputs.latest-version }}
   runs:
     using: composite
     steps:
@@ -20,7 +24,7 @@
         id: create_branch
         uses: peterjgrainger/action-create-branch@v2.2.0
         env:
-          GITHUB_TOKEN: ${{ inputs.token }}
+          GITHUB_TOKEN: ${{ inputs.github_token }}
         with:
           branch: update_json_${{ inputs.field }}
       - name: Checkout branch
@@ -34,28 +38,17 @@
            field: "${{ inputs.field}}"
            value: "${{ inputs.value }}"
       - name: Commit files
+        id: file_commit
         shell: bash
         run: |
          git config --local user.email "action@github.com"
          git config --local user.name "GitHub Action"
          git add -A
          git commit -m "updating ${{ inputs.field }} with ${{ inputs.value }}"
+         echo "branch=update_json_${{ inputs.field }}" >> $GITHUB_OUTPUT
       - name: Push changes
         uses: ad-m/github-push-action@v0.6.0
         with:
-         github_token: ${{ inputs.token }}
+         github_token: ${{ inputs.github_token }}
          branch: update_json_${{ inputs.field }}
-      - name: Create Pull Request
-        shell: bash
-        run: |
-          gh api \
-          --method POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          /repos/nationalarchives/da-tre-terraform-environments/pulls \
-          -f title='Updated json value' \
-          -f body='updating ${{ inputs.field }} with ${{ inputs.value }}' \
-          -f head=update_json_${{ inputs.field }} \
-          -f base='main'
-        env:
-          GH_TOKEN: ${{ inputs.token }}
+
