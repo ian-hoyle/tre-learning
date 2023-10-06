@@ -16,7 +16,7 @@
   outputs:
     branch:
       description: branch name containing updated values
-      value: ${{ steps.latest.outputs.latest-version }}
+      value: ${{ steps.file_commit.outputs.branch }}
   runs:
     using: composite
     steps:
