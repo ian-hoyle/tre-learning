@@ -51,7 +51,7 @@ jobs:
      steps:
         - name: div
           shell: bash
-          run: echo "FAILURE $(date '+%A %X"
+          run: echo "FAILURE $(date '+%A %X)"
      
      
   
