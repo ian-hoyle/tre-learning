@@ -1,0 +1,34 @@
+# Action to check if a version has been deployed
+name: 'Version deployed'
+description: 'Checks if version has been deployed'
+inputs:
+  text_input:
+    type: string
+    required: true
+    default: "tre-v2/tre-vb-bag-files-validation"
+
+runs:
+  using: "composite"
+  steps:
+    #    - name: login
+    #      uses: aws-actions/configure-aws-credentials@v3
+    #      with:
+    #        role-to-assume: ${{ secrets.aws-role }}
+    #        aws-region: eu-west-2
+    #        role-session-name: role-session-name-${{ github.actor }}-${{ github.triggering_actor }}
+    #    - name: describe images
+    #      id: image-versions
+    #      shell: bash
+    #      run: |
+    #        aws ecr list-images --repository-name="${{inputs.ecr_registry_path}}" --filter tagStatus=TAGGED > images.json
+    #        echo "images<<EOF" >> $GITHUB_OUTPUT
+    #        cat images.json >> $GITHUB_OUTPUT
+    #        echo "EOF" >> $GITHUB_OUTPUT
+    - name: Check if version deployed
+      id: deployed
+      shell: bash
+      run: |
+        echo "Hello ${{ inputs.text_input }}"
+      
+       
+   

@@ -7,6 +7,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import uk.gov.nationalarchives.tre.messages.drisip.available.{DRIPreingestSipAvailable, FileType, Parameters}
 import uk.gov.nationalarchives.tre.messages.event.{Producer, Properties}
+import uk.gov.nationalarchives.common.messages.Status
 
 
 
@@ -18,8 +19,9 @@ class LambdaHandlerSpec extends AnyFlatSpec with Matchers {
   implicit val genderEncoder: Encoder[Producer.Value] = Encoder.encodeEnumeration(Producer)
   implicit val gftEncoder: Encoder[FileType.Value] = Encoder.encodeEnumeration(FileType)
 
-  implicit val genderEncoder1: Decoder[Producer.Value] = Decoder.decodeEnumeration(Producer)
-  implicit val gftEncoder1: Decoder[FileType.Value] = Decoder.decodeEnumeration(FileType)
+  implicit val statusDecoder: Encoder[Status.Value] = Decoder.decodeEnumeration(Status)
+  implicit val produceDecoder: Decoder[Producer.Value] = Decoder.decodeEnumeration(Producer)
+
 
   "handleRequest" should "do something interesting" in {
 
