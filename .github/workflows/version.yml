@@ -46,7 +46,7 @@ jobs:
           exit 1
   end:
      runs-on: ubuntu-latest
-     needs: [add, multiply]
+     needs: [add, multiply, divide]
      if:  ${{failure()}}
      steps:
         - name: div
