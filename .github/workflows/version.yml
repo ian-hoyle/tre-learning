@@ -59,7 +59,7 @@ jobs:
       - name: div
         uses: ian-hoyle/tre-learning/.github/actions/test@0.9.2
         with:
-            text: "hello ${{ steps.date.outputs.date }}"
+            text_input: "hello ${{ steps.date.outputs.date }}"
           # shell: bash"
           # run: echo "FAILURE $(date '+%A %X')"
      
