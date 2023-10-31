@@ -42,4 +42,5 @@ jobs:
         shell: bash
         run: |
           di=$(( 3 / 0 ))
-          echo $di        
+          echo $di   
+          exit 1
