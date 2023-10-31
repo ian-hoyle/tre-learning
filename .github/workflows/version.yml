@@ -23,6 +23,7 @@ jobs:
           echo $add
   multiply:        
     runs-on: ubuntu-latest
+    needs: divide
     name: multiply
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -46,7 +47,7 @@ jobs:
           exit 1
   end:
      runs-on: ubuntu-latest
-     needs: [add, multiply, divide]
+     needs: [add, multiply]
      if:  ${{failure()}}
      steps:
         - name: div
