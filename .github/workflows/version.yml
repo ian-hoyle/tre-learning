@@ -19,6 +19,6 @@ jobs:
       - name: add
         shell: bash
         run: |
-          add = $(( 3 + 2 ))
+          add=$(( 3 + 2 ))
           echo $add
      
