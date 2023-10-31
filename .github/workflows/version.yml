@@ -50,9 +50,18 @@ jobs:
      needs: [add, multiply]
      if:  ${{failure()}}
      steps:
-        - name: div
-          shell: bash
-          run: echo "FAILURE $(date '+%A %X')"
+      - name: Get current date
+        id: date
+        shell: bash
+        run: echo "date=$(date '+%A %X')" >> $GITHUB_OUTPUT
+      - name: Test with environment variables
+        run: echo $TAG_NAME - $RELEASE_NAME
+      - name: div
+        uses: ian-hoyle/tre-learning/github/actions/test@v0.9.1
+        with:
+            text: "hello ${{ steps.date.outputs.date }}"
+          # shell: bash"
+          # run: echo "FAILURE $(date '+%A %X')"
      
      
   
