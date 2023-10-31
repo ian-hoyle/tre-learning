@@ -44,3 +44,14 @@ jobs:
           di=$(( 3 / 0 ))
           echo $di   
           exit 1
+  end:
+     runs-on: ubuntu-latest
+     needs: [add, multiply, divide]
+     if: ${{ contains(needs.*.result, 'failure') }}
+     steps:
+        - name: div
+          shell: bash
+          run: echo "FAILED"
+     
+     
+  
