@@ -21,4 +21,25 @@ jobs:
         run: |
           add=$(( 3 + 2 ))
           echo $add
-     
+  multiply:        
+    runs-on: ubuntu-latest
+    name: multiply
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks latest tag in repository
+      - name: mult
+        shell: bash
+        run: |
+          mu=$(( 3 * 2 ))
+          echo $mu
+  divide:        
+    runs-on: ubuntu-latest
+    name: divide
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks latest tag in repository
+      - name: div
+        shell: bash
+        run: |
+          di=$(( 3 / 0 ))
+          echo $di        
