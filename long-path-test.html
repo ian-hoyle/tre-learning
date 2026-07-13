@@ -158,10 +158,10 @@
       }
     });
 
-    // --- getAllFiles: matches app code in get-files-from-drag-event.ts exactly ---
+    // --- getAllFiles: based on app code but with timeouts to avoid hanging ---
     async function getAllFiles(entry, fileInfoInput) {
       const reader = entry.createReader();
-      const entries = await getEntriesFromReader(reader);
+      const entries = await getEntriesFromReader(reader, entry.fullPath);
       if (entry.isDirectory && entries.length === 0) {
         fileInfoInput.push({ path: entry.fullPath });
       }
@@ -176,27 +176,48 @@
       return fileInfoInput;
     }
 
-    function getEntriesFromReader(reader) {
+    function getEntriesFromReader(reader, dirPath) {
       return new Promise(async (resolve) => {
         let allEntries = [];
-        let nextBatch = await getEntryBatch(reader);
-        while (nextBatch.length > 0) {
-          allEntries = allEntries.concat(nextBatch);
-          nextBatch = await getEntryBatch(reader);
+        try {
+          let nextBatch = await getEntryBatch(reader, dirPath);
+          while (nextBatch.length > 0) {
+            allEntries = allEntries.concat(nextBatch);
+            nextBatch = await getEntryBatch(reader, dirPath);
+          }
+        } catch (err) {
+          console.warn(`readEntries failed/timed out for: ${dirPath}`, err);
         }
         resolve(allEntries);
       });
     }
 
-    function getEntryBatch(reader) {
-      return new Promise((resolve) => {
-        reader.readEntries((entries) => resolve(entries));
-      });
+    function getEntryBatch(reader, dirPath) {
+      return withTimeout(
+        new Promise((resolve, reject) => {
+          reader.readEntries(
+            (entries) => resolve(entries),
+            (err) => reject(err)
+          );
+        }),
+        5000,
+        `readEntries timed out for: ${dirPath}`
+      );
     }
 
     function getFileFromEntry(entry) {
-      return new Promise((resolve) => {
-        entry.file((file) => resolve({ file, path: entry.fullPath }));
+      return withTimeout(
+        new Promise((resolve, reject) => {
+          entry.file(
+            (file) => resolve({ file, path: entry.fullPath }),
+            (err) => reject(err)
+          );
+        }),
+        5000,
+        `entry.file() timed out for: ${entry.fullPath}`
+      ).catch(err => {
+        console.warn(err.message || err);
+        return { file: new File([], entry.name), path: entry.fullPath, accessError: err.message || 'Timed out' };
       });
     }
 
@@ -221,10 +242,10 @@
     }
 
     // --- Shared processing ---
-    function withTimeout(promise, ms) {
+    function withTimeout(promise, ms, msg) {
       return Promise.race([
         promise,
-        new Promise((_, reject) => setTimeout(() => reject(new Error(`Timed out after ${ms/1000}s`)), ms))
+        new Promise((_, reject) => setTimeout(() => reject(new Error(msg || `Timed out after ${ms/1000}s`)), ms))
       ]);
     }
 
