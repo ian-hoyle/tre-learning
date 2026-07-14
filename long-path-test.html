@@ -46,7 +46,15 @@
     <li>Either drag &amp; drop the folder below, or use the file picker</li>
   </ol>
 
-  <h2>Test 2: Using a symlink/junction (workaround)</h2>
+  <h2>Test 2: Method Comparison (detect silently omitted paths)</h2>
+  <p>Windows may silently omit folders/files with long paths from directory listings. To detect this:</p>
+  <ol>
+    <li>Select the <strong>same folder</strong> using two different methods below (e.g. drag &amp; drop, then file picker)</li>
+    <li>The comparison section at the bottom will highlight any paths found by one method but missing from the other</li>
+    <li>Missing paths indicate folders/files that were silently dropped due to long path limitations</li>
+  </ol>
+
+  <h2>Test 3: Using a symlink/junction (workaround)</h2>
   <p>This test demonstrates that using a junction preserves the internal folder structure while shortening the root path.</p>
   <ol>
     <li>Open Command Prompt as Administrator</li>
@@ -95,6 +103,23 @@
     <pre id="pathList" style="background:#f5f5f5; padding:15px; border-radius:4px; overflow-x:auto; font-size:12px;"></pre>
   </div>
 
+  <div id="method-comparison" style="margin-top:30px; display:none">
+    <h3>Method Comparison — Missing Paths</h3>
+    <p>Paths found by one method but not the other. These are likely silently omitted due to long path limitations.</p>
+    <div id="comparison-status" style="padding:10px; border-radius:4px; margin-bottom:10px;"></div>
+    <table id="comparison-table" style="display:none">
+      <thead>
+        <tr>
+          <th style="width:50%">Path</th>
+          <th style="width:25%">Found by</th>
+          <th style="width:25%">Missing from</th>
+        </tr>
+      </thead>
+      <tbody id="comparisonBody"></tbody>
+    </table>
+    <button id="clearComparison" style="margin-top:10px">Clear comparison data</button>
+  </div>
+
   <script>
     const dropzone = document.getElementById('dropzone');
     const filePicker = document.getElementById('filePicker');
@@ -122,6 +147,7 @@
           showStatus('Scanning directory tree via webkitGetAsEntry...', 'warning');
           const files = await getAllFiles(entry, []);
           showStatus(`Found ${files.length} file(s). Starting processing...`, 'warning');
+          storeMethodResult('Drag & Drop', files);
           await processFiles(files);
         } else {
           showStatus('Please drop a folder, not a file.', 'error');
@@ -136,6 +162,7 @@
         path: f.webkitRelativePath || f.name
       }));
       showStatus(`File picker returned ${files.length} file(s).`, 'warning');
+      storeMethodResult('File Picker', files);
       await processFiles(files);
     });
 
@@ -150,6 +177,7 @@
         showStatus('Scanning directory tree via File System Access API...', 'warning');
         const files = await getAllFilesFromFSA(dirHandle, dirHandle.name);
         showStatus(`Found ${files.length} file(s). Starting processing...`, 'warning');
+        storeMethodResult('FSA API', files);
         await processFiles(files);
       } catch (err) {
         if (err.name !== 'AbortError') {
@@ -390,6 +418,78 @@
       statusEl.className = type;
       statusEl.style.display = 'block';
     }
+
+    // --- Method Comparison ---
+    // Stores paths from each method so we can diff them
+    const methodResults = {};
+
+    function storeMethodResult(methodName, files) {
+      // Normalise paths: strip leading slash, use forward slashes
+      const paths = files
+        .filter(f => f.file) // only files, not directory entries
+        .map(f => f.path.replace(/\\/g, '/').replace(/^\//, ''));
+      methodResults[methodName] = new Set(paths);
+      updateComparison();
+    }
+
+    function updateComparison() {
+      const methods = Object.keys(methodResults);
+      const compEl = document.getElementById('method-comparison');
+      const compStatus = document.getElementById('comparison-status');
+      const compTable = document.getElementById('comparison-table');
+      const compBody = document.getElementById('comparisonBody');
+
+      if (methods.length < 2) {
+        compEl.style.display = 'block';
+        compStatus.innerHTML = `<strong>${methods.length}/2 methods tested.</strong> Use a second method (drag-and-drop, file picker, or FSA) on the same folder to compare results.`;
+        compStatus.style.background = '#fff3e0';
+        compStatus.style.border = '1px solid #ff9800';
+        compTable.style.display = 'none';
+        return;
+      }
+
+      compEl.style.display = 'block';
+      compBody.innerHTML = '';
+
+      // Compare all pairs
+      const allPaths = new Set();
+      methods.forEach(m => methodResults[m].forEach(p => allPaths.add(p)));
+
+      let missingCount = 0;
+      for (const path of [...allPaths].sort()) {
+        const presentIn = methods.filter(m => methodResults[m].has(path));
+        const missingFrom = methods.filter(m => !methodResults[m].has(path));
+
+        if (missingFrom.length > 0) {
+          missingCount++;
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td style="color:red">${path}</td>
+            <td class="pass">${presentIn.join(', ')}</td>
+            <td class="fail">${missingFrom.join(', ')}</td>
+          `;
+          compBody.appendChild(row);
+        }
+      }
+
+      if (missingCount === 0) {
+        compStatus.innerHTML = `<strong>✓ All ${allPaths.size} paths match across methods:</strong> ${methods.join(', ')}`;
+        compStatus.style.background = '#e8f5e9';
+        compStatus.style.border = '1px solid #4CAF50';
+        compTable.style.display = 'none';
+      } else {
+        compStatus.innerHTML = `<strong>⚠ ${missingCount} path(s) differ between methods:</strong> ${methods.join(' vs ')}. Total unique paths: ${allPaths.size}`;
+        compStatus.style.background = '#ffebee';
+        compStatus.style.border = '1px solid #f44336';
+        compTable.style.display = 'table';
+      }
+    }
+
+    document.getElementById('clearComparison').addEventListener('click', () => {
+      Object.keys(methodResults).forEach(k => delete methodResults[k]);
+      document.getElementById('method-comparison').style.display = 'none';
+      document.getElementById('comparison-table').style.display = 'none';
+    });
   </script>
 </body>
 </html>
