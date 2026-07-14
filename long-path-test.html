@@ -75,8 +75,7 @@
   <h3>Method 2: File picker (webkitdirectory)</h3>
   <input type="file" id="filePicker" webkitdirectory multiple>
 
-  <h3>Method 3: File System Access API (showDirectoryPicker)</h3>
-  <button id="fsaPicker">Select folder via File System Access API</button>
+
 
   <div id="status"></div>
 
@@ -123,7 +122,6 @@
   <script>
     const dropzone = document.getElementById('dropzone');
     const filePicker = document.getElementById('filePicker');
-    const fsaPicker = document.getElementById('fsaPicker');
     const resultsTable = document.getElementById('results');
     const resultsBody = document.getElementById('resultsBody');
     const statusEl = document.getElementById('status');
@@ -166,25 +164,6 @@
       await processFiles(files);
     });
 
-    // --- File System Access API (showDirectoryPicker) ---
-    fsaPicker.addEventListener('click', async () => {
-      if (!window.showDirectoryPicker) {
-        showStatus('File System Access API not supported in this browser.', 'error');
-        return;
-      }
-      try {
-        const dirHandle = await window.showDirectoryPicker();
-        showStatus('Scanning directory tree via File System Access API...', 'warning');
-        const files = await getAllFilesFromFSA(dirHandle, dirHandle.name);
-        showStatus(`Found ${files.length} file(s). Starting processing...`, 'warning');
-        storeMethodResult('FSA API', files);
-        await processFiles(files);
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          showStatus(`Error: ${err.message}`, 'error');
-        }
-      }
-    });
 
     // --- getAllFiles: based on app code but with timeouts to avoid hanging ---
     async function getAllFiles(entry, fileInfoInput) {
@@ -256,25 +235,6 @@
       });
     }
 
-    // --- File System Access API recursive traversal ---
-    async function getAllFilesFromFSA(dirHandle, path) {
-      const files = [];
-      for await (const [name, handle] of dirHandle.entries()) {
-        const childPath = path + '/' + name;
-        if (handle.kind === 'file') {
-          try {
-            const file = await handle.getFile();
-            files.push({ file, path: childPath });
-          } catch (err) {
-            files.push({ file: new File([], name), path: childPath, accessError: err.message });
-          }
-        } else if (handle.kind === 'directory') {
-          const subFiles = await getAllFilesFromFSA(handle, childPath);
-          files.push(...subFiles);
-        }
-      }
-      return files;
-    }
 
     // --- Shared processing ---
     function withTimeout(promise, ms, msg) {
