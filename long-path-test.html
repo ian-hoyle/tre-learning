@@ -162,6 +162,11 @@
     async function getAllFiles(entry, fileInfoInput) {
       const reader = entry.createReader();
       const entries = await getEntriesFromReader(reader, entry.fullPath);
+      if (entries === null) {
+        // Directory could not be read — likely long path issue
+        fileInfoInput.push({ path: entry.fullPath, unreadable: true });
+        return fileInfoInput;
+      }
       if (entry.isDirectory && entries.length === 0) {
         fileInfoInput.push({ path: entry.fullPath });
       }
@@ -187,6 +192,8 @@
           }
         } catch (err) {
           console.warn(`readEntries failed/timed out for: ${dirPath}`, err);
+          resolve(null);
+          return;
         }
         resolve(allEntries);
       });
@@ -271,7 +278,7 @@
       let unreadable = 0;
       let processed = 0;
 
-      for (const { file, path, accessError } of files) {
+      for (const { file, path, accessError, unreadable: unreadableDir } of files) {
         processed++;
         showStatus(`Processing file ${processed}/${files.length}: ${path.split('/').pop()}`, 'warning');
         await new Promise(r => setTimeout(r, 0));
@@ -283,11 +290,21 @@
         let actualSize = reportedSize;
         let checksum = '';
 
-        if (!file) {
-          // Directory entry (no file property) — skip
-          status = 'Empty directory';
-          statusClass = 'pass';
-          checksum = 'N/A';
+        if (!file && !accessError) {
+          if (unreadableDir) {
+            // Directory could not be read — flagged during enumeration
+            status = 'UNREADABLE FOLDER — readEntries timed out (size: -1)';
+            statusClass = 'fail';
+            actualSize = -1;
+            checksum = 'N/A';
+            longPathIssues++;
+            unreadable++;
+          } else {
+            // Genuinely empty directory
+            status = 'Empty directory';
+            statusClass = 'pass';
+            checksum = 'N/A';
+          }
         } else if (accessError) {
           status = `ACCESS DENIED — ${accessError}`;
           statusClass = 'fail';
