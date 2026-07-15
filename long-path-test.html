@@ -131,6 +131,29 @@
     .drag-and-drop__dropzone--dragover .drag-and-drop__hint-text { color: #fff; }
     .drag-and-drop__hint-text { margin-bottom: 0; font-size: 19px; }
 
+    /* GOV.UK Button */
+    .govuk-button {
+      font-size: 19px;
+      font-weight: 400;
+      padding: 8px 10px 7px;
+      border: 2px solid transparent;
+      border-radius: 0;
+      color: #fff;
+      background: #00703c;
+      box-shadow: 0 2px 0 #002d18;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 0;
+    }
+    .govuk-button:hover { background: #005a30; }
+    .govuk-button--secondary {
+      background: #f3f2f1;
+      color: #0b0c0c;
+      box-shadow: 0 2px 0 #929191;
+    }
+    .govuk-button--secondary:hover { background: #dbdad9; }
+
     /* GOV.UK Table */
     .govuk-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 16px; }
     .govuk-table__header, .govuk-table__cell {
@@ -259,24 +282,20 @@
             Use this page to check whether your folder is affected before you start your transfer.
           </p>
 
-          <div class="govuk-warning-text">
-            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-            <strong class="govuk-warning-text__text">
-              You must use drag and drop. The file selection dialog cannot check folder paths.
-            </strong>
-          </div>
-
           <div class="govuk-inset-text">
             <p class="govuk-body" style="margin:0">
-              Drag and drop the same top-level folder you intend to transfer.
+              Select the same top-level folder you intend to transfer.
               This check does not upload any files — it only reads the file paths in your browser.
             </p>
           </div>
 
-          <h2 class="govuk-heading-m">Drag and drop your folder</h2>
+          <h2 class="govuk-heading-m">Select a folder to check</h2>
+
+          <p class="govuk-body">Either drag and drop your folder below, or use the 'Select a folder' button.</p>
 
           <div class="drag-and-drop__dropzone" id="dropzone">
-            <p class="govuk-body drag-and-drop__hint-text">Drag and drop a single top-level folder here</p>
+            <p class="govuk-body drag-and-drop__hint-text">Drag and drop a single top-level folder here&nbsp;</p>
+            <button type="button" id="folder-picker-btn" class="govuk-button govuk-button--secondary">Select a folder</button>
           </div>
 
           <!-- Status / progress -->
@@ -355,6 +374,52 @@
       showBanner(`<span class="processing-spinner"></span> Checking ${files.length} item(s)…`, 'info');
       await processFiles(files);
     });
+
+    // --- Select a folder button (File System Access API) ---
+    const folderPickerBtn = document.getElementById('folder-picker-btn');
+    folderPickerBtn.addEventListener('click', async () => {
+      try {
+        const dirHandle = await window.showDirectoryPicker();
+        showBanner('<span class="processing-spinner"></span> Scanning folder — this may take a moment…', 'info');
+        const files = await getAllFilesFromHandle(dirHandle, '/' + dirHandle.name);
+        showBanner(`<span class="processing-spinner"></span> Checking ${files.length} item(s)…`, 'info');
+        await processFiles(files);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          showBanner(`Error: ${err.message}`, 'error');
+        }
+      }
+    });
+
+    // --- Recursive traversal using File System Access API handles ---
+    async function getAllFilesFromHandle(dirHandle, pathPrefix) {
+      const fileInfos = [];
+      try {
+        for await (const [name, handle] of dirHandle.entries()) {
+          const fullPath = pathPrefix + '/' + name;
+          if (handle.kind === 'directory') {
+            const children = await getAllFilesFromHandle(handle, fullPath).catch(() => null);
+            if (children === null) {
+              fileInfos.push({ path: fullPath, unreadable: true });
+            } else if (children.length === 0) {
+              fileInfos.push({ path: fullPath });
+            } else {
+              fileInfos.push(...children);
+            }
+          } else {
+            try {
+              const file = await withTimeout(handle.getFile(), 5000, `getFile timed out for: ${fullPath}`);
+              fileInfos.push({ file, path: fullPath });
+            } catch (err) {
+              fileInfos.push({ file: new File([], name), path: fullPath, accessError: err.message || 'Timed out' });
+            }
+          }
+        }
+      } catch (err) {
+        return null;
+      }
+      return fileInfos;
+    }
 
     // --- getAllFiles: recursive directory traversal with timeouts ---
     async function getAllFiles(entry, fileInfoInput) {
