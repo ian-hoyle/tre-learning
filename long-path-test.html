@@ -408,8 +408,22 @@
             }
           } else {
             try {
-              const file = await withTimeout(handle.getFile(), 5000, `getFile timed out for: ${fullPath}`);
-              fileInfos.push({ file, path: fullPath });
+              let file;
+              let lastErr;
+              for (let attempt = 0; attempt <= FILE_CHECK_MAX_RETRIES; attempt++) {
+                if (attempt > 0) await delay(FILE_CHECK_RETRY_DELAY_MS);
+                try {
+                  file = await withTimeout(handle.getFile(), 5000, `getFile timed out for: ${fullPath}`);
+                  break;
+                } catch (err) {
+                  lastErr = err;
+                }
+              }
+              if (file) {
+                fileInfos.push({ file, path: fullPath });
+              } else {
+                fileInfos.push({ file: new File([], name), path: fullPath, accessError: lastErr.message || 'Timed out' });
+              }
             } catch (err) {
               fileInfos.push({ file: new File([], name), path: fullPath, accessError: err.message || 'Timed out' });
             }
@@ -475,7 +489,7 @@
     }
 
     function getFileFromEntry(entry) {
-      return withTimeout(
+      const attempt = () => withTimeout(
         new Promise((resolve, reject) => {
           entry.file(
             (file) => resolve({ file, path: entry.fullPath }),
@@ -484,10 +498,21 @@
         }),
         5000,
         `entry.file() timed out for: ${entry.fullPath}`
-      ).catch(err => {
-        console.warn(err.message || err);
-        return { file: new File([], entry.name), path: entry.fullPath, accessError: err.message || 'Timed out' };
-      });
+      );
+
+      return (async () => {
+        let lastErr;
+        for (let i = 0; i <= FILE_CHECK_MAX_RETRIES; i++) {
+          if (i > 0) await delay(FILE_CHECK_RETRY_DELAY_MS);
+          try {
+            return await attempt();
+          } catch (err) {
+            lastErr = err;
+          }
+        }
+        console.warn(lastErr.message || lastErr);
+        return { file: new File([], entry.name), path: entry.fullPath, accessError: lastErr.message || 'Timed out' };
+      })();
     }
 
     function withTimeout(promise, ms, msg) {
