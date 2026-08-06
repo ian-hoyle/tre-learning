@@ -497,6 +497,27 @@
       ]);
     }
 
+    const FILE_CHECK_TIMEOUT_MS = 10000;
+    const FILE_CHECK_MAX_RETRIES = 3;
+    const FILE_CHECK_RETRY_DELAY_MS = 500;
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function readFileWithRetry(file) {
+      let lastErr;
+      for (let attempt = 0; attempt <= FILE_CHECK_MAX_RETRIES; attempt++) {
+        if (attempt > 0) await delay(FILE_CHECK_RETRY_DELAY_MS);
+        try {
+          return await withTimeout(file.arrayBuffer(), FILE_CHECK_TIMEOUT_MS);
+        } catch (err) {
+          lastErr = err;
+        }
+      }
+      throw lastErr;
+    }
+
     // --- Process and display results ---
     async function processFiles(files) {
       resultsBody.innerHTML = '';
@@ -540,7 +561,7 @@
           unreadable++;
         } else if (reportedSize > 0) {
           try {
-            await withTimeout(file.arrayBuffer(), 10000);
+            await readFileWithRetry(file);
             statusText = 'OK';
             tagClass = 'govuk-tag--green';
           } catch (err) {
@@ -552,7 +573,7 @@
           }
         } else {
           try {
-            const buffer = await withTimeout(file.arrayBuffer(), 10000);
+            const buffer = await readFileWithRetry(file);
             if (buffer.byteLength === 0) {
               statusText = 'OK (empty file)';
               tagClass = 'govuk-tag--green';
